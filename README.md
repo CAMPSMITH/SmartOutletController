@@ -59,6 +59,7 @@ kasa discover
 | Host | pi-influxdb (192.168.0.144) |
 | Executable location | /usr/local/smartoutletcontroller/ | 
 | Config location | /etc/smartoutletcontroller/ |
+| log file location | /var/log/smartoutletcontroller |
 
 ### Deploying Solution
 ```
@@ -73,10 +74,30 @@ python /usr/local/smartoutletcontroller/smartoutletcontroller.py --name=towergar
 ```
 ---
 
-## Usage
+## Example Configuration
+```
+devices:
+    - name: TowerPumpStrip
+      host: 192.168.0.156
+      type: strip
+      children: 
+        TowerPumpPlug:
+          default: 'off'
+          schedule:
+            - start: '11:00:00'
+              duration: '00:15:00'
+              state: 'on'
+            - start: '19:00:00'
+              duration: '00:15:00'
+              state: 'on'
+        SparePlug:
+          default: 'on'
+```
 
-TBD ...
-
+## Example CRONTAB configuration
+```
+* * * * * /usr/bin/python /usr/local/smartoutletcontroller/smartoutletcontroller.py --name=towergardenschedule
+```
 ---
 
 ## Contributors
