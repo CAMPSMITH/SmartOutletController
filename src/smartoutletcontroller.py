@@ -115,7 +115,7 @@ def get_desired_state(plug_name,plug_config,state_path=Path("/var/run/smartoutle
         if not state_file_path.absolute().exists():
           logger.info(f"{state_file_path.absolute()} does not exist, creating ...")
           # state file does not exist, create a schedule for the next event and store in the state file
-          create_next_event(entry,now)
+          next_event=create_next_event(entry,now)
           logger.debug(f"event scheduled: {next_event}")
           save_event(state_file_path,next_event)
         else:
