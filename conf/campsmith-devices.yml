@@ -1,0 +1,17 @@
+        name: CampSmith
+        log_level: INFO
+        log_path: /var/log/smartoutletcontroller 
+        devices:
+            GardenOutletStrip:
+                host: 192.168.0.156
+                timezone: "America/Los_Angeles"
+                type: strip
+                children: 
+                    TowerGarden:
+                        default: 'off'
+                        schedule:
+                            type: repeating
+                            cycle_on: '00:15:00'
+                            cycle_off: '00:15:00'
+                    Outdoor_Left:
+                        default: 'on'

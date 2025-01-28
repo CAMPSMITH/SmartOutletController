@@ -56,7 +56,7 @@ kasa discover
 
 | Parameter | Value |
 |-----------|-------|
-| Host | pi-influxdb (192.168.0.144) |
+| Host | pi-smart-home (192.168.0.125) |
 | Executable location | /usr/local/smartoutletcontroller/ | 
 | Config location | /etc/smartoutletcontroller/ |
 | log file location | /var/log/smartoutletcontroller/ |
@@ -132,3 +132,18 @@ devices:
 ## License
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+
+```
+uvicorn src.api:app --reload 
+```
+
+## executing cron script
+```
+trigger.sh 127.0.0.1:8000 GardenOutletStrip
+```
+
+## crontab
+```
+* * * * * /usr/local/bin/trigger.sh "127.0.0.1:8000" GardenOutletStrip
+```

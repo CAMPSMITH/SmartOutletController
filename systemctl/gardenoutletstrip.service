@@ -1,0 +1,16 @@
+[Unit]
+Description=GardenOutletStrip API
+After=network.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/repos/SmartOutletController
+Environment="PATH=/home/pi/.local/bin"
+ExecStart=/home/pi/.local/bin/uvicorn src.api:app --host 0.0.0.0 --port 8000 --workers 4
+Restart=always
+StandardOutput=inherit
+StandardError=inherit
+SyslogIdentifier=fastapi
+
+[Install]
+WantedBy=multi-user.target
