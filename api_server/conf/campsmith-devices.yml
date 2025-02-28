@@ -1,6 +1,6 @@
         name: CampSmith
         log_level: INFO
-        log_path: /var/log/smartoutletcontroller 
+        log_path: /var/log/smarthome
         devices:
             GardenOutletStrip:
                 host: 192.168.0.156

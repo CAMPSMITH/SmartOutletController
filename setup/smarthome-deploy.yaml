@@ -1,0 +1,308 @@
+- name: Setup CAMPSmith Home
+  hosts: campsmith-home
+  become: yes
+  vars:
+    work_dir: "/usr/local/share/campsmith/home"
+    config_dir: "/etc/smarthome"
+    # log_dir: "/usr/local/share/campsmith/home"
+  #   go_binary_url: "https://go.dev/dl/go{{ go_version }}.linux-arm64.tar.gz"
+  #   go_checksum: "sha256:c3fa6d16ffa261091a5617145553c71d21435ce547e44cc6dfb7470865527cc7"
+  tasks:
+
+    - name: copy api requirements
+      template: src=../api_server/requirements.txt dest={{ work_dir }}/requirements.txt
+
+    - name: install api requirements
+      ansible.builtin.pip:
+        requirements: "{{ work_dir }}/requirements.txt"
+        break_system_packages: true
+    # - name: Print all available facts
+    #   ansible.builtin.debug:
+    #     msg: "{{ playbook_dir }}/../api_server"
+    - name: Copy api files
+      copy:
+        src: "../api_server/smarthome.py"
+        dest: "{{ work_dir }}"
+        mode: '0755'
+        remote_src: no
+      become: true
+    - name: Copy api files
+      copy:
+        src: "../api_server/utils.py"
+        dest: "{{ work_dir }}"
+        mode: '0755'
+        remote_src: no
+    - name: Copy api config
+      copy:
+        src: "../api_server/conf/campsmith-devices.yml"
+        dest: "{{ config_dir }}/campsmith-devices.yml"
+        mode: '0755'
+        remote_src: no
+    - name: Copy console app file
+      copy:
+        src: "../smarthome_console/app.py"
+        dest: "{{ work_dir }}"
+        mode: '0755'
+        remote_src: no
+
+    # - name: Install python3-pip
+    #   apt:
+    #     name: python3-pip
+    #     state: present       
+    # - name: Install and upgrade pip
+    #   pip:
+    #     name: pip
+    #     break_system_packages: True
+    #     extra_args: --upgrade
+
+    # - name: Check certbot installed
+    #   ansible.builtin.stat:
+    #     path: /usr/bin/certbot
+    #   register: certbot_installed 
+
+    # - name: install certbot block
+    #   when: not certbot_installed.stat.exists
+    #   block:
+    #     - name: Install certbot 
+    #       ansible.builtin.apt:
+    #         name: python3-certbot
+    #         state: present
+
+    #     - name: Install certbot nginx plugin
+    #       ansible.builtin.apt:
+    #         name: python3-certbot-nginx
+    #         state: present
+
+    # - name: Install nginx
+    #   apt:
+    #     name: nginx
+    #     state: present
+    # - name: Delete sites-available
+    #   ansible.builtin.file:
+    #     state: absent
+    #     path: /etc/nginx/sites-available/
+    # - name: Delete sites-enabled/
+    #   ansible.builtin.file:
+    #     state: absent
+    #     path: /etc/nginx/sites-enabled/
+    # - name: Delete www/html
+    #   ansible.builtin.file:
+    #     state: absent
+    #     path: /var/www/html/
+    # - name: Start nginx
+    #   service:
+    #     name: nginx
+    #     state: started
+    #     enabled: yes        
+
+    # - name: Check if site1 path exists
+    #   stat:
+    #     path: /var/www/site1
+    #   register: site1_check
+    # - name: Create site1 path
+    #   file:
+    #     path: /var/www/site1
+    #     state: directory
+    #     mode: 0755
+    #   when: not site1_check.stat.exists        
+    # - name: copy site1.html to nginx
+    #   template: src=www/site1.html dest=/var/www/site1/index.html
+    # - name: Check if site2 path exists
+    #   stat:
+    #     path: /var/www/site2
+    #   register: site2_check
+    # - name: Create site2 path
+    #   file:
+    #     path: /var/www/site2
+    #     state: directory
+    #     mode: 0755
+    #   when: not site2_check.stat.exists         
+    # - name: copy site2.html to nginx
+    #   template: src=www/site2.html dest=/var/www/site2/index.html
+    # - name: Check if site3 path exists
+    #   stat:
+    #     path: /var/www/site3
+    #   register: site3_check
+    # - name: Create site3 path
+    #   file:
+    #     path: /var/www/site3
+    #     state: directory
+    #     mode: 0755
+    #   when: not site3_check.stat.exists         
+    # - name: copy site3.html to nginx
+    #   template: src=www/site3.html dest=/var/www/site3/index.html
+
+    # - name: copy campsmith.conf to proxy server
+    #   template: src=nginx/campsmith.conf dest=/etc/nginx/conf.d/campsmith.conf
+
+    # - name: copy home.conf to proxy server
+    #   template: src=nginx/home.conf dest=/etc/nginx/conf.d/home.conf
+
+    # - name: copy sabot.conf to proxy server
+    #   template: src=nginx/sabot.conf dest=/etc/nginx/conf.d/sabot.conf
+
+    # - name: copy default.conf to proxy server
+    #   template: src=nginx/default.conf dest=/etc/nginx/conf.d/default.conf
+
+    # - name: Get go path
+    #   ansible.builtin.stat:
+    #     path: /usr/local/go/bin/go
+    #   register: go_installed      
+
+    # - name: Install Go if not installed
+    #   when: not go_installed.stat.exists
+    #   block:
+    #     - name: download go checksum
+    #       ansible.builtin.get_url:
+    #         url: "{{ go_binary_url }}"
+    #         dest: "/tmp/go{{ go_version }}.linux-arm64.tar.gz"
+    #         mode: '0755'
+    #         checksum: "{{ go_checksum }}"
+    #     - name: Extract and move new go folder to /usr/local
+    #       command: tar -C /usr/local -xzf /tmp/go{{ go_version }}.linux-arm64.tar.gz
+
+    #     - name: Delete downloaded tar file
+    #       shell: rm /tmp/go{{ go_version }}.linux-arm64.tar.gz*
+
+    #     - name: Add go binary path to ~/.profile
+    #       become: no
+    #       lineinfile:
+    #         path: ~/.profile
+    #         line: 'export GOPATH=/usr/local/go'
+    #         create: true
+    #         state: present
+    #     - name: Add go binary path to ~/.profile
+    #       lineinfile:
+    #         path: ~/.profile
+    #         line: 'export GOPATH=/usr/local/go'
+    #         create: true
+    #         state: present
+    #     - name: Add go binary path to ~/.profile
+    #       become: no
+    #       lineinfile:
+    #         path: ~/.profile
+    #         line: 'export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin'
+    #         create: true
+    #         state: present
+    #     - name: Add go binary path to ~/.profile
+    #       lineinfile:
+    #         path: ~/.profile
+    #         line: 'export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin'
+    #         create: true
+    #         state: present
+
+    #     - name: Source updated profile and test go version
+    #       become: no
+    #       shell: . ~/.profile && go version
+    #     - name: Source updated profile and test go version
+    #       shell: . /root/.profile && go version
+
+
+
+    # - name: Get oauth2-proxy path
+    #   ansible.builtin.stat:
+    #     path: /usr/local/go/bin/oauth2-proxy
+    #   register: oauth2_proxy_installed
+    # - name: Install oauth2-proxy
+    #   when: not oauth2_proxy_installed.stat.exists
+    #   ansible.builtin.shell: . /root/.profile && go install github.com/oauth2-proxy/oauth2-proxy/v7@latest
+    # - name: Check if oauth2-procy config path exists
+    #   stat:
+    #     path: /etc/oauth2-proxy
+    #   register: oauth2_proxy_conf_check
+    # - name: Create oauth2-procy config path
+    #   file:
+    #     path: /etc/oauth2-proxy
+    #     state: directory
+    #     mode: 0755
+    #   when: not oauth2_proxy_conf_check.stat.exists   
+
+    # - name: Create oauth2-proxy group
+    #   group:
+    #     name: oauth2-proxy
+    #     state: present
+
+    # - name: Create oauth2-proxy user
+    #   user:
+    #     name: oauth2-proxy
+    #     state: present
+    #     groups: oauth2-proxy
+    #     append: yes
+
+    # - name: Check if oauth2-proxy log path exists
+    #   ansible.builtin.stat:
+    #     path: /var/log/oauth2-proxy
+    #   register: oauth2_proxy_log_path_status
+
+    # - name: Create oauth2-proxy log path and set permissions
+    #   ansible.builtin.file:
+    #     path: /var/log/oauth2-proxy
+    #     state: directory
+    #     mode: '0777'
+    #     owner: oauth2-proxy
+    #     group: oauth2-proxy
+    #   when: not oauth2_proxy_log_path_status.stat.exists
+
+
+    # - name: copy campsmith oauth2-proxy config
+    #   template: src=oauth2-proxy/campsmith.oauth2-proxy.conf dest=/etc/oauth2-proxy/campsmith.oauth2-proxy.conf
+    # - name: copy sabot oauth2-proxy config
+    #   template: src=oauth2-proxy/sabot.oauth2-proxy.conf dest=/etc/oauth2-proxy/sabot.oauth2-proxy.conf
+    # - name: copy home.campsmith oauth2-proxy config
+    #   template: src=oauth2-proxy/smarthome.oauth2-proxy.conf dest=/etc/oauth2-proxy/smarthome.oauth2-proxy.conf
+
+
+    # - name: Check if campsmith oauth2-proxy is installed
+    #   ansible.builtin.systemd:
+    #     name: campsmith.oauth2-proxy.service
+    #   register: campsmith_oauth2_proxy_check
+
+    # - name: Install campsmith oauth2 proxy service
+    #   when: campsmith_oauth2_proxy_check.status.CanStart == 'no'
+    #   template: src=systemd/campsmith.oauth2-proxy.service dest=/etc/systemd/system/campsmith.oauth2-proxy.service
+    #   notify:
+    #     - Start campsmith oauth2-proxy
+                
+    # - name: Check if sabot oauth2-proxy is installed
+    #   ansible.builtin.systemd:
+    #     name: sabot.oauth2-proxy.service
+    #   register: sabot_oauth2_proxy_check
+
+    # - name: Install sabot oauth2 proxy service
+    #   when: sabot_oauth2_proxy_check.status.CanStart == 'no'
+    #   template: src=systemd/sabot.oauth2-proxy.service dest=/etc/systemd/system/sabot.oauth2-proxy.service
+    #   notify:
+    #     - Start sabot oauth2-proxy
+
+                
+    # - name: Check if smarthome oauth2-proxy is installed
+    #   ansible.builtin.systemd:
+    #     name: smarthome.oauth2-proxy.service
+    #   register: smarthome_oauth2_proxy_check
+
+    # - name: Install smarthome oauth2 proxy service
+    #   when: smarthome_oauth2_proxy_check.status.CanStart == 'no'
+    #   template: src=systemd/smarthome.oauth2-proxy.service dest=/etc/systemd/system/smarthome.oauth2-proxy.service
+    #   notify:
+    #     - Start smarthome oauth2-proxy
+
+    # - name: restart nginx
+    #   shell: echo "restarting nginx"
+    #   notify:
+    #     - restart nginx
+
+  # handlers:
+  #   - name: restart nginx
+  #     service: name=nginx state=restarted        
+  #   - name: Start campsmith oauth2-proxy
+  #     systemd:
+  #       name: campsmith.oauth2-proxy.service
+  #       state: started
+  #   - name: Start sabot oauth2-proxy
+  #     systemd:
+  #       name: sabot.oauth2-proxy.service
+  #       state: started        
+  #   - name: Start smarthome oauth2-proxy
+  #     systemd:
+  #       name: smarthome.oauth2-proxy.service
+  #       state: started                

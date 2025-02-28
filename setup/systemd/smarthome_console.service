@@ -1,0 +1,15 @@
+[Unit]
+Description=CAMPSmith smarthome console
+After=network.target
+
+[Service]
+User=pi
+WorkingDirectory=/usr/local/share/campsmith/home
+ExecStart=/usr/local/bin/streamlit run app.py --server.address=0.0.0.0 --server.port 8501 --browser.gatherUsageStats=false
+Restart=always
+StandardOutput=inherit
+StandardError=inherit
+SyslogIdentifier=streamlit
+
+[Install]
+WantedBy=multi-user.target
