@@ -39,3 +39,9 @@
         dest: "{{ config_dir }}/campsmith-devices.yml"
         mode: '0755'
         remote_src: no
+    - name: Copy streamlit config
+      copy:
+        src: "../conf/.streamlit/config.toml"
+        dest: "{{ work_dir }}/.streamlit/config.toml"
+        mode: '0755'
+        remote_src: no

@@ -33,6 +33,17 @@
         mode: 0755
       when: not work_dir_check.stat.exists  
 
+    - name: Check if console streamlit config exists
+      stat:
+        path: "{{ work_dir }}/.streamlit"
+      register: work_dir_streamlit_check
+    - name: Create work_dir
+      file:
+        path: "{{ work_dir }}.streamlit"
+        state: directory
+        mode: 0755
+      when: not work_dir_streamlit_check.stat.exists  
+
     - name: Check if config dir exists
       stat:
         path: "{{ config_dir }}"
