@@ -38,85 +38,77 @@ The software control system will be implemented in Python because Python is ubiq
 
 ### Software Control System Design
 * Designed to be triggered and run via crontab.  crontab is reliable and built into Raspberry Pi's.  This will enable self healing and recovery.
-* Fire used to manage command line arguments
 * Logging used to manage log messages and log files
 * Yaml used to manage configuration
 * python-kasa: a python library to control Kasa devices see ![kasa-python library](https://github.com/python-kasa/python-kasa)
 
 ---
-## Smart Device Discovery
-The `kasa-python` library defines a tool to discover Kasa devices:
-```
-kasa discover
-```
 
----
+### Setup
+See `/setup/README.md`
 
-## Deployment Overview
-
-| Parameter | Value |
-|-----------|-------|
-| Host | pi-smart-home (192.168.0.125) |
-| Executable location | /usr/local/smartoutletcontroller/ | 
-| Config location | /etc/smartoutletcontroller/ |
-| log file location | /var/log/smartoutletcontroller/ |
-| State Mgt location | /var/run/smartoutletcontroller/ |
-
-### Deploying Solution
-```
-scp src/smartoutletcontroller.py pi@192.168.0.144:/usr/local/smartoutletcontroller/
-scp conf/towergardenschedule.yml pi@192.168.0.144:/etc/smartoutletcontroller/
-```
-
-### Running the smart outlet software controller
-Assuming the schedule to be managed is named `towergardenschedule`, from the host, issue the following:
-```
-python /usr/local/smartoutletcontroller/smartoutletcontroller.py --name=towergardenschedule
-```
 ---
 
 ## Example Configurations
-### Fixed schedule
+```yaml
+name: GardenOutletStrip
+log_level: INFO
+log_path: /var/log/smarthome
+db_path: /var/data/devices.db
+host: 192.168.0.156
+timezone: "America/Los_Angeles"
+type: strip
+plugs: 
+    TowerGarden:
+        default: 'off'
+        schedule:
+            type: repeating
+            cycle_on: '00:15:00'
+            cycle_off: '00:15:00'
+    Outdoor_Left:
+        default: 'on'
 ```
-devices:
-    - name: TowerPumpStrip
-      host: 192.168.0.156
-      type: strip
-      children: 
-        TowerPumpPlug:
-          default: 'off'
-          schedule:
-            - type: fixed
-              start: '09:30:00'
-              duration: '00:15:00'
-              state: 'on'
-            - type: fixed
-              start: '19:00:00'
-              duration: '00:15:00'
-              state: 'on'
-        SparePlug:
-          default: 'on'
+
+---
+
+### run api
 ```
-### Repeating schedule
+KASA_OUTLET_CONFIG=conf/campsmith-devices-local.yml uvicorn smarthome_api:api --host 0.0.0.0 --port 8000 --reload
 ```
-devices:
-    - name: TowerPumpStrip
-      host: 192.168.0.156
-      type: strip
-      children: 
-        TowerPumpPlug:
-          default: 'off'
-          schedule:
-            - type: repeating
-              cycle_on: '00:15:00'
-              cycle_off: '00:15:00'
-        SparePlug:
-          default: 'on'
+
+### healthcheck
 ```
+curl http://127.0.0.1:8000/healthcheck
+```
+
+### get plug state
+```
+curl http://127.0.0.1:8000/plug/TowerGarden
+```
+
+### set plug
+```
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"state":1}' \
+  http://127.0.0.1:8000/plug/TowerGarden
+```
+
+### patch plug
+```
+curl -X PATCH http://127.0.0.1:8000/plug/TowerGarden
+```
+
+## run SmartHome console
+```
+KASA_OUTLET_CONFIG=conf/campsmith-devices-local.yml streamlit run smarthome_console.py
+```
+
+---
 
 ## Example CRONTAB configuration
 ```
-* * * * * /usr/bin/python /usr/local/smartoutletcontroller/smartoutletcontroller.py --name=towergardenschedule
+* * * * * curl -X PATCH http://127.0.0.1:8000/TowerGarden
 ```
 ---
 
@@ -133,17 +125,3 @@ devices:
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-
-```
-uvicorn src.api:app --reload 
-```
-
-## executing cron script
-```
-trigger.sh 127.0.0.1:8000 GardenOutletStrip
-```
-
-## crontab
-```
-* * * * * /usr/local/bin/trigger.sh "127.0.0.1:8000" GardenOutletStrip
-```

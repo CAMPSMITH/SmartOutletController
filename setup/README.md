@@ -18,3 +18,4 @@ ansible-playbook -i hosts.yaml smarthome-setup.yaml
 ```
 ansible-playbook -i hosts.yaml smarthome-deploy.yaml
 ```
+

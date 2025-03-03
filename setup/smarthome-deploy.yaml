@@ -19,19 +19,25 @@
     # - name: Print all available facts
     #   ansible.builtin.debug:
     #     msg: "{{ playbook_dir }}/../api_server"
-    - name: Copy api files
+    - name: Copy smarthome.py
       copy:
         src: "../api_server/smarthome.py"
         dest: "{{ work_dir }}"
         mode: '0755'
         remote_src: no
       become: true
-    - name: Copy api files
+    - name: Copy utils.py
       copy:
         src: "../api_server/utils.py"
         dest: "{{ work_dir }}"
         mode: '0755'
         remote_src: no
+    - name: Copy event_registry.py
+      copy:
+        src: "../api_server/event_registry.py"
+        dest: "{{ work_dir }}"
+        mode: '0755'
+        remote_src: no        
     - name: Copy api config
       copy:
         src: "../api_server/conf/campsmith-devices.yml"

@@ -5,6 +5,7 @@
     work_dir: "/usr/local/share/campsmith/home"
     config_dir: "/etc/smarthome"
     log_dir: "/var/log/smarthome"
+    db_dir: "/var/data"
   tasks:
     - name: Update and upgrade apt packages
       apt:
@@ -56,6 +57,17 @@
         owner: pi
         group: pi
       when: not log_dir_check.stat.exists  
+
+    - name: Check if db_dir exists
+      stat:
+        path: "{{ db_dir }}"
+      register: db_dir_check
+    - name: Create db_dir
+      file:
+        path: "{{ db_dir }}"
+        state: directory
+        mode: 0777
+      when: not db_dir_check.stat.exists        
 
     - name: Copy smarthome api service config
       template: src=systemd/smarthome.service dest=/etc/systemd/system/smarthome.service
