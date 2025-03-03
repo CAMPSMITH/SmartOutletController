@@ -240,7 +240,7 @@ class SmartStrip():
             if 'default' in self.config['plugs'][plug]:
                 default = self.config['plugs'][plug]['default']
                 if self.logger is not None:
-                    self.logger.info(f"{plug} default = {default}")
+                    self.logger.debug(f"{plug} default = {default}")
         return 1 if default=='on' else 0
 
     def get_expected_state(self,plug):
@@ -324,7 +324,6 @@ class SmartStrip():
         # default_state = self.get_default_state(plug_name)
         # expected_state = self.get_expected_state(plug_name)
         # current_state = self.get_current_state(plug_name)
-
         # check to see if there are events for the device
         if not self.has_events(plug_name):
             # no events for device.  add first event
@@ -332,10 +331,16 @@ class SmartStrip():
             event,event_at = self.next_event(plug_name,current_state,time_mark)
             self.put(plug_name,current_state,event,event_at)
             if current_state == 1:
-                return self.on(plug_name)
+                result = self.on(plug_name)
+                if self.logger is not None:
+                    self.logger.info(result)
+                return result
             else:
-                return self.off(plug_name)
-            
+                result = self.off(plug_name)
+                if self.logger is not None:
+                    self.logger.info(result)
+                return result
+
         # device has events, pop event
         expected_state = self.get_expected_state(plug_name)
         plug_events = self.pop(plug_name,time_mark)
@@ -352,13 +357,17 @@ class SmartStrip():
         current_state = self.get_current_state(plug_name)
         if current_state != expected_state:
             if expected_state == 1:
+                result = self.on(plug_name)
                 if self.logger is not None:
-                    self.logger.info(f"{plug_name} is {expected_state}")
-                return self.on(plug_name)
+                    self.logger.info(result)
+                return result
             else:
+                result = self.off(plug_name)
                 if self.logger is not None:
-                    self.logger.info(f"{plug_name} is {expected_state}")
-                return self.off(plug_name)               
+                    self.logger.info(result)
+                return result
+        if self.logger is not None:
+            self.logger.info(json.dumps({plug_name:current_state}))    
         return {plug_name:current_state}
 
     def get_events_df(self):    
