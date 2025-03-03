@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=pi
 WorkingDirectory=/usr/local/share/campsmith/home
-ExecStart=/usr/local/bin/uvicorn smarthome:api --host 0.0.0.0 --port 8000
+ExecStart=/usr/local/bin/uvicorn smarthome_api:api --host 0.0.0.0 --port 8000
 Restart=always
 StandardOutput=inherit
 StandardError=inherit

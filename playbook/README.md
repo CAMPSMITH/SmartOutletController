@@ -8,14 +8,19 @@ CAMPSmith SmartHome encompasses the following
 * python
 * FASTAPI
 * Streamlit
+* kasa
 
 ## Run Setup Playbook
+* use the playboon venv
+* from root repo
 ```
-ansible-playbook -i hosts.yaml smarthome-setup.yaml
+ansible-playbook -i conf/hosts.yaml playbook/smarthome-setup.yaml
 ```
 
 ## Run Deploy Playbook
+* use the playboon venv
+* from root repo
 ```
-ansible-playbook -i hosts.yaml smarthome-deploy.yaml
+ansible-playbook -i conf/hosts.yaml playbook/smarthome-deploy.yaml
 ```
 

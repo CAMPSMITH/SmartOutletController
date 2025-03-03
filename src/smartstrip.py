@@ -8,6 +8,7 @@ import time
 from pathlib import Path
 import sqlite3
 import pandas as pd
+from pathlib import Path
 
 class ConfigurationError(Exception):
     pass
@@ -17,7 +18,7 @@ class UnknownDeviceError(Exception):
 
 class SmartStrip():
     config = None
-    config_path = None
+    config_path = Path('/etc/campsmith/home/campsmith-devices.yml')
     logger = None
     sqliteConnection = None
     ddl=[
@@ -195,6 +196,8 @@ class SmartStrip():
         return result
 
     def on(self,plug):
+        if plug not in self.config['plugs']:
+            raise UnknownDeviceError(f"{plug} not in config")
         if self.logger is not None:
             self.logger.debug("cmd = on")
         result = subprocess.run(["kasa", "--json", "--host",self.config['host'], "on","--child",plug], capture_output=True, text=True)
@@ -208,6 +211,8 @@ class SmartStrip():
         return {plug: 1}
 
     def off(self,plug):
+        if plug not in self.config['plugs']:
+            raise UnknownDeviceError(f"{plug} not in config")
         if self.logger is not None:
             self.logger.debug("cmd = off")
         result = subprocess.run(["kasa", "--json", "--host",self.config['host'], "off","--child",plug], capture_output=True, text=True)
@@ -249,10 +254,12 @@ class SmartStrip():
         return int(state)
 
     def get_current_state(self,plug):
+        if plug not in self.config['plugs']:
+            raise UnknownDeviceError(f"{plug} not in config")        
         status = self.status()
         if plug in status:
             return status[plug]
-        return None
+        raise UnknownDeviceError(f"{plug} not valid")
 
     def put(self,plug,current_state,event,event_at):
         key = f"{self.config['name']}/{plug}"

@@ -73,17 +73,19 @@ plugs:
 
 ### run api
 ```
-KASA_OUTLET_CONFIG=conf/campsmith-devices-local.yml uvicorn smarthome_api:api --host 0.0.0.0 --port 8000 --reload
+KASA_OUTLET_CONFIG=conf/campsmith-devices-local.yml uvicorn src.smarthome_api:api --host 0.0.0.0 --port 8000 --reload
 ```
 
 ### healthcheck
 ```
 curl http://127.0.0.1:8000/healthcheck
+curl http://192.168.0.125:8000/healthcheck
 ```
 
 ### get plug state
 ```
 curl http://127.0.0.1:8000/plug/TowerGarden
+curl http://192.168.0.125:8000/plug/TowerGarden
 ```
 
 ### set plug
@@ -92,16 +94,21 @@ curl --header "Content-Type: application/json" \
   --request POST \
   --data '{"state":1}' \
   http://127.0.0.1:8000/plug/TowerGarden
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"state":0}' \
+  http://192.168.0.125:8000/plug/TowerGarden
 ```
 
 ### patch plug
 ```
 curl -X PATCH http://127.0.0.1:8000/plug/TowerGarden
+curl -X PATCH http://192.168.0.125:8000/plug/TowerGarden
 ```
 
 ## run SmartHome console
 ```
-KASA_OUTLET_CONFIG=conf/campsmith-devices-local.yml streamlit run smarthome_console.py
+KASA_OUTLET_CONFIG=conf/campsmith-devices-local.yml streamlit run src/smarthome_console.py
 ```
 
 ---

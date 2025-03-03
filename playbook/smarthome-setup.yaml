@@ -1,0 +1,109 @@
+- name: Setup CAMPSmith Home
+  hosts: campsmith-home
+  become: yes
+  vars:
+    work_dir: "/usr/local/share/campsmith/home"
+    config_dir: "/etc/campsmith/home"
+    log_dir: "/var/log/campsmith/home"
+    db_dir: "/var/data"
+  tasks:
+    - name: Update and upgrade apt packages
+      apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 # One day  
+    - name: Install python3-pip
+      apt:
+        name: python3-pip
+        state: present       
+    - name: Install and upgrade pip
+      pip:
+        name: pip
+        break_system_packages: True
+        extra_args: --upgrade
+
+    - name: Check if work_dir exists
+      stat:
+        path: "{{ work_dir }}"
+      register: work_dir_check
+    - name: Create work_dir
+      file:
+        path: "{{ work_dir }}"
+        state: directory
+        mode: 0755
+      when: not work_dir_check.stat.exists  
+
+    - name: Check if config dir exists
+      stat:
+        path: "{{ config_dir }}"
+      register: config_dir_check
+    - name: Create config_dir
+      file:
+        path: "{{ config_dir }}"
+        state: directory
+        mode: 0755
+      when: not config_dir_check.stat.exists  
+
+    - name: Check if log dir exists
+      stat:
+        path: "{{ log_dir }}"
+      register: log_dir_check
+    - name: Create log_dir
+      file:
+        path: "{{ log_dir }}"
+        state: directory
+        mode: 0755
+        owner: pi
+        group: pi
+      when: not log_dir_check.stat.exists  
+
+    - name: Check if db_dir exists
+      stat:
+        path: "{{ db_dir }}"
+      register: db_dir_check
+    - name: Create db_dir
+      file:
+        path: "{{ db_dir }}"
+        state: directory
+        mode: 0777
+      when: not db_dir_check.stat.exists        
+
+    - name: Copy smarthome api service config
+      template: src=../conf/systemd/smarthome_api.service dest=/etc/systemd/system/smarthome_api.service
+
+    - name: Check if smarthome api service is installed
+      ansible.builtin.systemd:
+        name: smarthome_api.service
+      register: smarthome_api_service_check
+
+    - name: Install smarthome api service
+      when: smarthome_api_service_check.status.CanStart == 'no'
+      shell: echo "starting smarthome api service"
+      notify:
+        - Start smarthome api service
+
+    - name: Copy smarthome console service config
+      template: src=../conf/systemd/smarthome_console.service dest=/etc/systemd/system/smarthome_console.service
+
+    - name: Check if smarthome console service is installed
+      ansible.builtin.systemd:
+        name: smarthome_console.service
+      register: smarthome_console_service_check
+
+    - name: Install smarthome console service
+      shell: echo "starting smarthome console service"
+      when: smarthome_console_service_check.status.CanStart == 'no'
+      notify:
+        - Start smarthome console service
+
+  handlers:   
+    - name: Start smarthome api service
+      systemd:
+        name: smarthome_api.service
+        state: started
+
+    - name: Start smarthome console service
+      systemd:
+        name: smarthome_console.service
+        state: started
+             

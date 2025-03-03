@@ -1,0 +1,41 @@
+- name: Setup CAMPSmith Home
+  hosts: campsmith-home
+  become: yes
+  vars:
+    work_dir: "/usr/local/share/campsmith/home"
+    config_dir: "/etc/campsmith/home"
+    log_dir: "/var/log/campsmith/home"
+    db_dir: "/var/data"    
+  tasks:
+
+    - name: copy requirements
+      template: src=../requirements.txt dest={{ work_dir }}/requirements.txt
+
+    - name: install requirements
+      ansible.builtin.pip:
+        requirements: "{{ work_dir }}/requirements.txt"
+        break_system_packages: true
+    - name: Copy smartstrip.py
+      copy:
+        src: "../src/smartstrip.py"
+        dest: "{{ work_dir }}"
+        mode: '0755'
+        remote_src: no
+    - name: Copy smarthome_api.py
+      copy:
+        src: "../src/smarthome_api.py"
+        dest: "{{ work_dir }}"
+        mode: '0755'
+        remote_src: no
+    - name: Copy smarthome_console.py
+      copy:
+        src: "../src/smarthome_console.py"
+        dest: "{{ work_dir }}"
+        mode: '0755'
+        remote_src: no        
+    - name: Copy smartstrip config
+      copy:
+        src: "../conf/campsmith-devices.yml"
+        dest: "{{ config_dir }}/campsmith-devices.yml"
+        mode: '0755'
+        remote_src: no

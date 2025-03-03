@@ -51,22 +51,27 @@ async def healthcheck():
 async def set_plug(plug_name:str,plug_set: PlugSet):
     global strip
     result = None
-    if plug_set.state==1:
-        result = strip.on(plug_name)
-    else:
-        result = strip.off(plug_name)
-    return result
+    try:
+        if plug_set.state==1:
+            result = strip.on(plug_name)
+        else:
+            result = strip.off(plug_name)
+        return result
+    except UnknownDeviceError as unk:
+        raise HTTPException(status_code=404, detail=str(unk))
 
 @api.get("/plug/{plug_name:path}")
 # curl http://127.0.0.1:8000/plug/TowerGarden
-async def set_plug(plug_name:str):
+async def get_plug(plug_name:str):
     global strip
-    return {plug_name:strip.get_current_state(plug_name)}
-
+    try:
+        return {plug_name:strip.get_current_state(plug_name)}
+    except UnknownDeviceError as unk:
+        raise HTTPException(status_code=404, detail=str(unk))
 
 @api.patch("/plug/{plug_name:path}")
 # curl -X PATCH http://127.0.0.1:8000/plug/TowerGarden
-async def set_plug(plug_name:str):
+async def trigger_plug(plug_name:str):
     global strip
     try:
         return strip.handle(plug_name,int(datetime.now().timestamp()))
