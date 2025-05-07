@@ -39,7 +39,7 @@
       register: work_dir_streamlit_check
     - name: Create work_dir
       file:
-        path: "{{ work_dir }}.streamlit"
+        path: "{{ work_dir }}/.streamlit"
         state: directory
         mode: 0755
       when: not work_dir_streamlit_check.stat.exists  

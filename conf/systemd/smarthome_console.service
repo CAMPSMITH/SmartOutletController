@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=pi
 WorkingDirectory=/usr/local/share/campsmith/home
-ExecStart=/usr/local/bin/streamlit run smarthome_console.py --server.address=0.0.0.0 --server.port 8501 --browser.gatherUsageStats=false
+ExecStart=/usr/local/bin/streamlit run smarthome_console.py
 Restart=always
 StandardOutput=inherit
 StandardError=inherit

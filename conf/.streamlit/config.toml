@@ -158,14 +158,14 @@ headless = true
 # any aliases (like localhost).
 
 # Default: (unset)
-address = 0.0.0.0
+address = "0.0.0.0"
 
 # The port where the server will listen for browser connections.
 
 # Don't use port 3000 which is reserved for internal development.
 
 # Default: 8501
-port = 8503
+# port = 8501
 
 # The base path for the URL where Streamlit should be served from.
 
